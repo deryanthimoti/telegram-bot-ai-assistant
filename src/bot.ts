@@ -1,8 +1,8 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { logCommand } from './logger';
-import { getMarketData } from './services/coinGecko';
-import { formatPrice } from './utils/price';
-import { getMessageType, parseCommand, parseCoinPrompt } from './utils/parser';
+import { getDexMarketDataByTokenAddress } from './services/dexScreener';
+import { getCoinInsightAndSafetyScore } from './services/langchain';
+import { getMessageType, parseCommand, parseCoinPrompt, parseAddress } from './utils/parser';
 import { caching } from './cache';
 import { MessageType } from './types';
 
@@ -30,7 +30,16 @@ bot.on('message', async (msg) => {
         response = 'Welcome! Send commands to log them.';
         break;
       case 'help':
-        response = 'Available commands: /help, /info';
+        response = `Available commands: 
+/help: List of commands available 
+/info: Information about ChrisBBot
+
+Enter a coin token address to get AI analysis of coin safety.
+For example: 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr (Popcat)
+
+Enter "What's the price of $<coin_symbol>?" to check for coin's market data. Ensure that you enter the coin's name after the '$' sign and don't forget the question mark.
+For example: What's the price of $btc?
+        `;
         break;
       case 'info':
         response = 'ChristiantoBBot is a Telegram Bot to check for Crypto Price and analyze your coins.';
@@ -56,7 +65,28 @@ Liquidity: $${cacheResult.liquidity}`;
           bot.sendMessage(msg.chat.id, response);
       }
     } else sendCommandNotFound(chatId);
-    
+  } else if (messageType === 'ADDRESS') {
+    let command = parseAddress(text);
+
+    if (command) {
+      await logCommand(userId, username, text);
+      const dexScreenerData = await getDexMarketDataByTokenAddress(text);
+
+      const response = await getCoinInsightAndSafetyScore(dexScreenerData);
+      console.log(response);
+
+      if (dexScreenerData) {
+        let response = `📊 Token: ${dexScreenerData.name}
+Chain: ${dexScreenerData.chainId}
+Price: $${dexScreenerData.currentPrice}
+Liquidity: $${dexScreenerData.liquidity}
+Volume 24h: $${dexScreenerData.totalVolume}        
+`;
+        bot.sendMessage(msg.chat.id, response);
+      } else {
+        bot.sendMessage(chatId, `I'm sorry, we couldn't find the coin with the token address that you specify. Please try something else.`);
+      }
+    }
   }
 });
 

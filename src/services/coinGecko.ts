@@ -2,7 +2,7 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const COIN_GECKO_API_BASE_ROUTE = "https://api.coingecko.com/api/v3/"
+const COIN_GECKO_API_BASE_ROUTE = "https://api.coingecko.com/api/v3";
 
 export async function getCoinList() {
   try {
