@@ -1,21 +1,26 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { logCommand } from './logger';
-import { getCoinGeckoData } from './services/coinGecko';
+import { getMarketData } from './services/coinGecko';
 import { formatPrice } from './utils/price';
-import { parseCoinCommand } from './utils/parser';
-import { addToCache } from './cache';
+import { getMessageType, parseCommand, parseCoinPrompt } from './utils/parser';
+import { caching } from './cache';
+import { MessageType } from './types';
 
-// Replace with your token
 const token = process.env.TELEGRAM_BOT_TOKEN!;
 export const bot = new TelegramBot(token, { polling: true });
 
-// Define command handling
-bot.onText(/\/(\w+)/, async (msg, match) => {
-  const command = match?.[1];
-  const userId = msg.from?.id.toString() || 'unknown';
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text || '';
+  const userId = msg.from?.id || -1;
   const username = msg.from?.username || 'unknown';
 
-  if (command) {
+  const messageType: MessageType | null = getMessageType(text);
+
+  if (!messageType) {
+    sendCommandNotFound(chatId);
+  } else if (messageType === 'COMMAND') {
+    let command = parseCommand(text);
     await logCommand(userId, username, command);
 
     // Customize responses
@@ -34,36 +39,25 @@ bot.onText(/\/(\w+)/, async (msg, match) => {
         response = `Unknown command: /${command}, please use /help for more commands`;
     }
     bot.sendMessage(msg.chat.id, response);
-  }
-});
+  } else if (messageType === 'PROMPT') {
+    let command = parseCoinPrompt(text);
 
-bot.on('message', async (msg) => {
-  const chatId = msg.chat.id;
-  const text = msg.text || '';
-  const userId = msg.from?.id.toString() || 'unknown';
-  const username = msg.from?.username || 'unknown';
-
-  const command = parseCoinCommand(text);
-
-  if (command) {
-    await logCommand(userId, username, text);
-    // Check for coin data in cache
-    const coinId = await addToCache(command.coinId.toLowerCase());
-    if (coinId === null) {
-      sendCoinNotFound(msg.chat.id);
-    } else {
-      const result = await getCoinGeckoData(coinId);
-      if (result.error) {
+    if (command?.coinId) {
+      await logCommand(userId, username, text);
+      // Check for coin data in cache
+      const cacheResult = await caching(command.coinId.toLowerCase());
+      if (cacheResult === null) {
         sendCoinNotFound(msg.chat.id);
       } else {
-        let response = `💰${result.name}
-Current Price: $${result.market_data.current_price.usd}
-Volume 24h: $${formatPrice(result.market_data.total_volume.usd)}
-Liquidity: $`;
-        bot.sendMessage(msg.chat.id, response);
+        let response = `💰${cacheResult.name}
+Current Price: $${cacheResult.currentPrice}
+Volume 24h: $${cacheResult.totalVolume}
+Liquidity: $${cacheResult.liquidity}`;
+          bot.sendMessage(msg.chat.id, response);
       }
-    }
-  } else sendCommandNotFound(chatId);
+    } else sendCommandNotFound(chatId);
+    
+  }
 });
 
 const sendCommandNotFound = (chatId: number) => {

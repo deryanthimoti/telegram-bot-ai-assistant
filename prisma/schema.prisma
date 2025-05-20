@@ -16,13 +16,15 @@ datasource db {
 model Log {
   id        Int     @id @default(autoincrement())
   createdAt DateTime @default(now())
-  userId    String
+  userId    Int
   username  String?
   command   String
 }
 
 model Cache {
-  id        Int     @id @default(autoincrement())
-  coinId    String
-  deletedAt DateTime
+  id          Int     @id @default(autoincrement())
+  coinId      String
+  coinSymbol  String
+  coinName    String
+  deletedAt   DateTime
 }

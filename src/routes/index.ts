@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { getAllCoinGeckoData } from '../services/coinGecko';
+import { getCoinList } from '../services/coinGecko';
 
 export async function registerRoutes(fastify: FastifyInstance) {
   fastify.get('/hello', async (request, reply) => {
@@ -7,7 +7,7 @@ export async function registerRoutes(fastify: FastifyInstance) {
   });
 
   fastify.get('/coins/list', async (request, reply) => {
-    const data = await getAllCoinGeckoData();
+    const data = await getCoinList();
     return data;
   });
 }
