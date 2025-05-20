@@ -11,3 +11,10 @@ https://t.me/ChristiantoBBot
 # Commands
 /help: List of commands that could be processed by the bots
 /info: Information about the bot
+
+# .env file
+Your .env file should consist of these lines:
+`DATABASE_URL="postgresql://<db_username>:<db_passwprd>@localhost:5432/<db_name>"
+TELEGRAM_BOT_TOKEN="<your_telegram_bot_token>"
+COIN_GECKO_API_KEY="<your_coin_gecko_api_key>"
+OPENAI_API_KEY="<your_openai_api_key>"`
