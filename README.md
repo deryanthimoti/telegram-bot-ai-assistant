@@ -24,3 +24,6 @@ TELEGRAM_BOT_TOKEN="<your_telegram_bot_token>"
 COIN_GECKO_API_KEY="<your_coin_gecko_api_key>"
 OPENAI_API_KEY="<your_openai_api_key>"
 ```
+
+# Demo
+<video controls src="Screen Recording 2025-05-21 at 14.20.20.mov" title="Title"></video>
