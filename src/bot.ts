@@ -72,15 +72,19 @@ Liquidity: $${cacheResult.liquidity}`;
       await logCommand(userId, username, text);
       const dexScreenerData = await getDexMarketDataByTokenAddress(text);
 
-      const response = await getCoinInsightAndSafetyScore(dexScreenerData);
-      console.log(response);
-
       if (dexScreenerData) {
+        const insightAndSafetyScore = await getCoinInsightAndSafetyScore(dexScreenerData);
         let response = `📊 Token: ${dexScreenerData.name}
 Chain: ${dexScreenerData.chainId}
 Price: $${dexScreenerData.currentPrice}
 Liquidity: $${dexScreenerData.liquidity}
-Volume 24h: $${dexScreenerData.totalVolume}        
+Volume 24h: $${dexScreenerData.totalVolume}
+
+🧠 AI Insight:
+${insightAndSafetyScore.insight || `We couldn't give the insight for the time being`}
+
+🛡️ Safety Score: ${insightAndSafetyScore.score || '?'}
+(Estimated based on on-chain activity and liquidity metrics)
 `;
         bot.sendMessage(msg.chat.id, response);
       } else {

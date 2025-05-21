@@ -6,7 +6,7 @@ import { RunnableSequence } from '@langchain/core/runnables';
 export async function getCoinInsightAndSafetyScore(data: any) {
   const model = new ChatOpenAI({
     openAIApiKey: process.env.OPENAI_API_KEY,
-    modelName: 'gpt-3.5-turbo',
+    modelName: 'gpt-4.1-2025-04-14',
     temperature: 0.7,
   });
 
@@ -19,11 +19,11 @@ export async function getCoinInsightAndSafetyScore(data: any) {
 
   // 4. Call the chain with user input
   const response = await chain.invoke({ input: `Give insight about this coin and analyze the safety score (0-100) based on this data:
-${data} in this format:
+${JSON.stringify(data)}. Respons only in this JSON format:
+{
 insight: string;
 score: number;
-`});
+}`});
 
-  console.log('Response:', response.content);
-  return response.content;
+  return JSON.parse(response.content as string);
 }
