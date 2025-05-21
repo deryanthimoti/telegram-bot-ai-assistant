@@ -19,7 +19,7 @@ export async function getCoinInsightAndSafetyScore(data: any) {
 
   // 4. Call the chain with user input
   const response = await chain.invoke({ input: `Give insight about this coin and analyze the safety score (0-100) based on this data:
-${JSON.stringify(data)}. Respons only in this JSON format:
+${JSON.stringify(data)}. Response only in this JSON format:
 {
 insight: string;
 score: number;

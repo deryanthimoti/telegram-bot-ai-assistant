@@ -16,6 +16,19 @@ https://t.me/ChristiantoBBot
 `/help`: List of commands that could be processed by the bots <br/>
 `/info`: Information about the bot
 
+Enter a coin token address to get AI analysis of coin safety.
+For example: 7GCihgDB8fe6KNjn2MYtkzZcRjQy3t9GHdC8uHYmW2hr (Popcat)
+
+The Prompt to the AI will be: Give insight about this coin and analyze the safety score (0-100) based on this data:
+<your data in JSON>. Response only in this JSON format:
+{
+insight: string;
+score: number;
+}
+
+Enter "What's the price of $<coin_symbol>?" to check for coin's market data. Ensure that you enter the coin's name after the '$' sign and don't forget the question mark.
+For example: What's the price of $btc?
+
 # .env file
 Your .env file should consist of these lines:
 ```
