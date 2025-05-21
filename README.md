@@ -1,6 +1,9 @@
 # Telegram Bot Link
 https://t.me/ChristiantoBBot
 
+# System Design
+![data-flow](<data-flow.png>)
+
 # How to run
 1. Ensure you have installed Node JS and Postgre SQL.
 2. Change the username and password in .ENV file. For example 
