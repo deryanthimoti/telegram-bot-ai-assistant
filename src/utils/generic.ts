@@ -15,3 +15,21 @@ export function formatPrice(value: number): string {
     return `-${formatPrice(Math.abs(value))}`;
   }
 }
+
+export function multiSort<T>(
+  array: T[],
+  priorities: { key: keyof T; direction: 'asc' | 'desc' }[]
+): T[] {
+  return [...array].sort((a, b) => {
+    for (const { key, direction } of priorities) {
+      const aVal = a[key] as unknown as number;
+      const bVal = b[key] as unknown as number;
+      const diff = aVal - bVal;
+
+      if (diff !== 0) {
+        return direction === 'asc' ? diff : -diff;
+      }
+    }
+    return 0;
+  });
+}
